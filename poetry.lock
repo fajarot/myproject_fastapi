@@ -229,6 +229,14 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "mariadb"
+version = "1.1.4"
+description = "Python MariaDB extension"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
 name = "markupsafe"
 version = "2.1.1"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -574,7 +582,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8.0,<3.9"
-content-hash = "614e7ec0553472a4f607bfe134baa8750b529d14cb8a0a8943fd1671b5f5caac"
+content-hash = "2bdb3224797706bbfeae02a98571ca04f4c91e3145797bb7d72bb87cb8c79e85"
 
 [metadata.files]
 aiohttp = []
@@ -596,6 +604,7 @@ importlib-metadata = []
 itsdangerous = []
 jedi = []
 jinja2 = []
+mariadb = []
 markupsafe = []
 multidict = []
 numpy = []
