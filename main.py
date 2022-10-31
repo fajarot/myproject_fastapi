@@ -55,8 +55,8 @@ async def tes_sql():
 
 
 
-@app.post('/api/v1/midtrans', response_model=schemas.responseApi)
-async def input_data_midtrans(data: schemas.getApi):
+@app.post('/api/v1/midtrans/notification', response_model=schemas.responseApi)
+async def input_notification(data: schemas.getApi):
   return crud.input_midtrans(data)
 
 @app.get('/api/v1/order/{tele_id}', response_model=schemas.responseApi)

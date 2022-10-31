@@ -1,6 +1,7 @@
 import os
 import mysql.connector
 
+
 def create_db_conn(value_date):
     if value_date == 'xyz':
         db = 'db1'
@@ -16,9 +17,16 @@ def create_db_conn(value_date):
     return iss_cnxn
 
 class Database:
+  mydb = create_db_conn('asda')
+
+  table_name = {
+  'order_history': 'order_history',
+  'order_fail': 'order_fail',
+  'order_success': 'order_success'
+}
 
   def __init__(self):
-    self.db = create_db_conn('asda')
+    self.db = Database.mydb
     self.cursor = self.db.cursor()
 
   def __enter__(self):
@@ -28,29 +36,23 @@ class Database:
     self.db.close()
 
   
-  def insert_payment(self, data):
-    
-    sql = '''INSERT INTO order_history (order_id, tele_id, status_code, payment_type, merchant_id, gross_amount, fraud_status, currency, transaction_id, transaction_status, transaction_time) 
-    VALUES (%s, (
-      SELECT
-        tele_id
-      FROM
-        user
-      WHERE
-        user_id = %s
-    ), %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
-    val = (data['order_id'], 15, data['status_code'], data['payment_type'], data['merchant_id'], data['gross_amount'], data['fraud_status'], data['currency'], data['transaction_id'], data['transaction_status'], data['transaction_time'])
-    
-    self.cursor.execute(sql, val)
+  def insert_payment(self, data, table):
 
-    self.db.commit()
-
-    result = True if self.cursor.rowcount > 0 else False
-    print("1 record inserted, ID:", self.cursor.rowcount)
-
-    self.db.close()
-
-    return result
+    for table_name in table:
+      sql = '''INSERT INTO '''+table_name+''' 
+      (order_id, tele_id, status_code, payment_type, 
+      merchant_id, gross_amount, fraud_status, currency, 
+      transaction_id, transaction_status, transaction_time) 
+      VALUES 
+      (%s, 
+      (SELECT tele_id FROM user WHERE tele_id = %s), 
+      %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
+      val = (data['order_id'], data['tele_id'], data['status_code'], data['payment_type'], data['merchant_id'], data['gross_amount'], data['fraud_status'], data['currency'], data['transaction_id'], data['transaction_status'], data['transaction_time'])
+      
+      self.cursor.execute(sql, val)
+  
+  
+    return self
 
   
   def get_data(self):
@@ -90,25 +92,29 @@ class Database:
     return result[0]
 
 
-  def tes_sql_query(self):
+  def tes_sql_query(self, input):
 
-    query = '''INSERT INTO GeekTable1 (Id1, Name1, City1)
-                VALUES (%s, %s, %s)'''
-    val = (1, 'nama gua ini', 'Jombang lah boss')
+    # for x in ('GeekTable1', 'GeekTable2'):
+    #   query = '''INSERT INTO '''+x+''' (Id, Name, City)
+    #               VALUES (%s, %s, %s)'''
+    #   val = (data[0], data[1], data[2])
+    #   self.cursor.execute(query, val)
+    # for x in ('GeekTable1', 'GeekTable2'):
+    for data in input:
+      query = '''INSERT INTO '''+data[3]+''' (Id, Name, City)
+                  VALUES (%s, %s, %s)'''
+      val = (data[0], data[1], data[2])
+      self.cursor.execute(query, val)
 
-    self.cursor.execute(query, val)
+    return self
+    
 
-    query = '''INSERT INTO GeekTable2 (Id2, Name2, City2)
-                VALUES (%s, %s, %s)'''
-    val = (1, 'nama gua ini', 'Jombang lah boss')
-
-    self.cursor.execute(query, val)
-
+  def comit(self):
+    
     self.db.commit()
     
-    result = True if self.cursor.rowcount > 0 else False
+    result = 'Notif Inserted' if self.cursor.rowcount > 0 else 'Something Wrong'
     print("1 record inserted, ID:", self.cursor.rowcount)
     
-    self.db.close()
-    
     return result
+

@@ -41,8 +41,16 @@ def midtrans(data: schemas.getApi):
 
 def tes_sql():
   
-  with Database() as mydbs:
-    msg = mydbs.tes_sql_query()
+  # with Database() as mydbs:
+  #   msg = mydbs.tes_sql_query()
+  data = [(1, 'nama gua data 1', 'Jombang lah data 1', 'GeekTable1'),
+          (1, 'nama gua data 1', 'Jombang lah data 1', 'GeekTable1'),
+          (1, 'nama gua data 1', 'Jombang lah data 1', 'GeekTable1'),
+          (1, 'nama gua data 1', 'Jombang lah data 1', 'GeekTable1'),
+          (1, 'nama gua data 1', 'Jombang lah data 1', 'GeekTable2'),
+         (2, 'nama gua data 2', 'Jombang lah data 2', 'GeekTable2')]
+
+  msg = mydb.tes_sql_query(data).comit()
   
   return schemas.responseApi(status=200, message=msg)
 
@@ -53,12 +61,30 @@ def input_midtrans(data: schemas.getApi):
   data = data.dict()
   data['tele_id'] = data['order_id'].split('-')[1]
 
-  if mydb.check_order_exist(data['order_id']) == 1:
-    return schemas.responseApi(status=202, message='data already in DB')
+  # if mydb.check_order_exist(data['order_id']) == 1:
+  #   return schemas.responseApi(status=202, message='data already in DB')
 
-  status = 200 if mydb.insert_payment(data) == True else 500
+  # status = 200 if mydb.insert_payment(data) == True else 500
+  print('===Notification===')
+  table = set()
+  if data['transaction_status'] == 'capture':
+    if data['fraud_status'] == 'challenge':
+      table.add(mydb.table_name['order_success'])
+    elif data['fraud_status'] == 'accept':
+      table.add(mydb.table_name['order_success'])
+  elif data['transaction_status'] == 'settlement':
+    table.add(mydb.table_name['order_success'])
+  elif data['transaction_status'] == 'cancel' or data['transaction_status'] == 'deny' or data['transaction_status'] == 'expire':
+    table.add(mydb.table_name['order_fail'])
+  elif data['transaction_status'] == 'pending':
+    pass
 
-  return schemas.responseApi(status=status)
+  table.add(mydb.table_name['order_history'])
+
+  msg = mydb.insert_payment(data, table).comit()
+
+  print(msg)
+  return schemas.responseApi(status=200, message=msg)
 
 
 def isOrder_midtrans(tele_id: str):
